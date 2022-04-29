@@ -6,6 +6,6 @@ The idea is the following: neutrinos being massive gives them a slight delay, wh
 $$ \Delta t \sim \frac{D}{c} \frac{E^2}{m^2}
 $$
 which looks like this:
-![figure](delays.pdf)
+![figure](delays.png)
 
 So, in principle we can use this effect to measure their mass! 
