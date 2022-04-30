@@ -10,4 +10,4 @@ which looks like this:
 
 ![figure](delays.png)
 
-So, in principle we can use this effect to measure their mass! 
+The idea here is to use GW + neutrino emission from failed supernovae to measure the neutrino mass.
