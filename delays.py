@@ -31,8 +31,8 @@ if __name__ == '__main__':
     # neutrino energy
     Es = np.linspace(5, 30) * u.MeV
 
-    # distance to SN
-    D = 50 * u.kpc
+    # distance to SN, supposing it's in the vicinity of the galactic center
+    D = 10 * u.kpc
     
     masses = np.linspace(m_min, m_max, num=20) * u.meV
     
@@ -44,9 +44,9 @@ if __name__ == '__main__':
 
     plt.colorbar(mpl.cm.ScalarMappable(norm, cmap), label='Neutrino mass [meV]')
     plt.title(f'SN distance = {D}')
-    plt.legend(loc='upper right')
+    # plt.legend(loc='upper right')
     plt.xlabel("Delay [ms]")
     plt.ylabel("Energy [MeV]")
 
-    plt.savefig('delays.pdf')
+    plt.savefig('delays.png')
     plt.close()
