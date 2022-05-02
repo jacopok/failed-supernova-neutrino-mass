@@ -21,5 +21,15 @@ If this is abrupt enough, and if we have both gravitational wave and neutrino da
 then we can use the GWs to determine the emission end time, and compare to the last neutrino arrival;
 if there is a measurable delay, this gives us a _lower bound on a single* neutrino mass_!
 
-(What is the effect of oscillations on this? What is the quantity we're actually measuring?)
+Actually, we're not measuring "a neutrino mass"; we will very likely observe the interaction 
+of an electron antineutrino, and therefore measure 
+$$ m_e = \sum _{i} U_{i e} m_i
+$$
+where $m_i$ are the three mass eigenstates, and $U$ is the flavor mixing matrix.
 
+Let's make a list of the potential problems with this approach:
+
+1. neutrino statistics: _is there at least one neutrino arriving later than the end of emission_?
+1. GW end time determination uncertainty: _can we determine the end of GW emission within sub-millisecond accuracy_?
+1. astrophysical delay systematics: the end of emission is not as sharp as we would need / 
+   there is a difference at the source between the end times of GW and neutrino emission.
