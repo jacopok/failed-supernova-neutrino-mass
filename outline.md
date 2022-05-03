@@ -31,5 +31,22 @@ Let's make a list of the potential problems with this approach:
 
 1. neutrino statistics: _is there at least one neutrino arriving later than the end of emission_?
 1. GW end time determination uncertainty: _can we determine the end of GW emission within sub-millisecond accuracy_?
-1. astrophysical delay systematics: the end of emission is not as sharp as we would need / 
+    1. sky localization errors: if there is no optical "counterpart" (star disappering), the localization error may overcome the 
+1. astrophysical delay systematics: the end of emission may not be as sharp as we would need / 
    there is a difference at the source between the end times of GW and neutrino emission.
+
+## Neutrino statistics
+
+
+
+## GW end time determination uncertainty
+
+It seems [question during the ET OSB meeting to Adam Burrows] that there are no actual simulations
+of the GW emission from failed supernovae. 
+
+Until we have those, I work on a best-case-scenario hypothesis: I take a waveform from one of the 
+supernovae they simulated ([here](https://arxiv.org/abs/1812.07703)) and chop it at an arbitrary time;
+will I be able to recover the burst end time with sufficient precision?
+
+Already the sampling rate is not wonderful 
+- they give their waveforms at 16kHz, or 62.5microseconds between samples!
