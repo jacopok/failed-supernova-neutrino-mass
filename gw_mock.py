@@ -1,5 +1,3 @@
-#%%
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -10,91 +8,135 @@ import scipy.signal as signal
 
 from pycbc.psd import from_string as psd_from_string
 from pycbc.noise import noise_from_psd
+from pycbc.psd import interpolate
 
-TIME_STOP = 0.5
-distance = .5 * u.kpc
-scaling = (distance / u.cm).to(u.dimensionless_unscaled).value
+from scipy.io.wavfile import write
+from scipy.signal.windows import get_window
 
-# this is D times h+, in centimeters
-waveform_file = 'GW_strains/s15.0.swbj16.horo.3d.gw.dat'
-
-data = pd.read_csv(waveform_file, sep=' ', names=['time', 'hplus', 'hcross'], skiprows=1)
-
-data['time'] -= min(data['time'])
-
-time = np.linspace(0, max(data['time']), num=5*len(data['time']))
-
-delta_t = time[1] - time[0]
-
-hplus = np.interp(time, data['time'], data['hplus']) / scaling
-
-index_stop = np.searchsorted(time, TIME_STOP)
-
-transition_steps = 100
-
-hplus[index_stop-transition_steps:index_stop] *= (np.arange(transition_steps, 0, step=-1) / transition_steps)**3
-hplus[index_stop:] = 0
-
-my_psd = psd_from_string('aLIGOZeroDetHighPower', 2**19, 1, 10)
-
-noise = noise_from_psd(len(time), delta_t, my_psd)
-
-hplus += noise
-
-#%%
-
-f, t, Sxx = signal.spectrogram(hplus, 1/delta_t, nperseg=1<<13)
-plt.pcolormesh(
-    t, f[:25], Sxx[:25, :], 
-    shading='gouraud', 
-    norm=mpl.colors.PowerNorm(gamma=.4)
-)
-# plt.ylim(0, 2e3)
-
-plt.show()
-
-#%%
-f, t, Sxx = signal.spectrogram(hplus, 1/delta_t, nperseg=1<<6)
-plt.pcolormesh(
-    t, f, Sxx, 
-    shading='gouraud', 
-    norm=mpl.colors.PowerNorm(gamma=.3)
-)
-# plt.ylim(0, 2e4)
-
-plt.xlim(.498, .502)
-plt.show()
-
-#%%
-
-plt.plot((time-TIME_STOP)*1000, hplus)
-
-plt.xlim(-1, 1)
-plt.xlabel('Time from end of signal [ms]')
-plt.show()
+def make_wavable(array):
+    """Make a numpy array ready to be saved as a WAV file.
+    This entails turning it into integers, normalizing them 
+    to their highest attainable value.
+    """
+    return (array / array.max() * np.iinfo(np.int16).max).astype(np.int16)
 
 
-#%%
+def read_file_and_resample(filename: str, sample_rate: int, distance: u.Quantity[u.kpc]):
 
-# timeseries = TimeSeries(
-#     data=hplus, 
-#     sample_rate=u.Hz / delta_t,
-#     t0=t0
-# )
+    scaling = (distance / u.cm).to(u.dimensionless_unscaled).value
+    # this is D times h+, in centimeters
+
+    data = pd.read_csv(filename, sep=' ', names=['time', 'hplus', 'hcross'], skiprows=1)
+
+    data['time'] -= min(data['time'])
+    total_time = max(data['time'])
+    time = np.linspace(0, total_time, num=int(total_time*sample_rate))
+    delta_t = time[1] - time[0]
+    hplus = np.interp(time, data['time'], data['hplus']) / scaling
+    
+    return time, hplus
+
+def set_to_zero_after_time(time_stop: float, time_array: np.ndarray, waveform: np.ndarray):
+    
+    index_stop = np.searchsorted(time_array, time_stop)
+
+    transition_steps = 100
+
+    waveform[index_stop-transition_steps:index_stop] *= (np.arange(transition_steps, 0, step=-1) / transition_steps)**3
+    waveform[index_stop:] = 0
+    
+    return waveform
+
+def add_noise_and_whiten(waveform: np.ndarray, srate: int, seglen: float):
+    """Inspired from https://pycbc.org/pycbc/latest/html/gw150914.html#plotting-the-whitened-strain
+    """
+
+    delta_f = 1 / seglen
+    low_frequency_cutoff=1
+
+    my_psd = psd_from_string(
+        'aLIGOZeroDetHighPower', 
+        int(srate / 2 / delta_f)+1, 
+        delta_f, 
+        low_frequency_cutoff,
+    )
+
+    for i, element in enumerate(my_psd):
+        if element < 1e-50:
+            my_psd[i] = 1e-30
+
+    noise = noise_from_psd(len(waveform), 1/srate, my_psd)
+
+    # waveform += noise
+    waveform = noise
+    
+    window = get_window(('tukey', .1), len(waveform))
+    
+    waveform *= window
+
+    waveform = waveform.to_frequencyseries()
+
+    return waveform
+    # my_psd = interpolate(my_psd, waveform.to_frequencyseries().delta_f) + 1e-60
+
+    whitened = waveform / np.sqrt(my_psd * 2 * seglen)
+    
+    return whitened.to_timeseries()
 
 
-# asd = timeseries.asd()
+def main():
 
-# # asd.plot()
+    TIME_STOP = 0.5
+    SRATE = 2**18
+    waveform_file = 'GW_strains/s15.0.swbj16.horo.3d.gw.dat'
+    distance = 1. * u.kpc
 
-# spectrum = timeseries.q_transform(
-#     frange=(200, 10000),
-#     # outseg=(t0, time[-1]+t0),
-#     qrange=(5, 200), 
-#     logf=True,
-#     tres=1e-4,
-#     # norm=False,
-#     whiten=False,
-#     fduration=.5,
-#     )
-# plot = spectrum.plot()
+    time, hplus = read_file_and_resample(waveform_file, SRATE, distance)
+    hplus = set_to_zero_after_time(TIME_STOP, time, hplus)
+    delta_t = time[1] - time[0]
+    
+    hplus = add_noise_and_whiten(hplus, SRATE, len(hplus) / SRATE)
+    
+    hplus_fd = hplus.to_frequencyseries()
+    
+    plt.plot(hplus_fd.sample_frequencies, abs(hplus_fd))
+    seglen=len(hplus) / SRATE
+    delta_f = 1 / seglen
+    low_frequency_cutoff=1
+    my_psd = psd_from_string(
+        'aLIGOZeroDetHighPower', 
+        int(SRATE / 2 / delta_f)+1, 
+        delta_f, 
+        low_frequency_cutoff,
+    )
+    plt.plot(my_psd.sample_frequencies, abs(np.sqrt(my_psd.to_frequencyseries())))
+    plt.show()
+    
+    plt.plot(abs(hplus.to_frequencyseries()))
+    plt.show()
+
+    # f, t, Sxx = signal.spectrogram(hplus, 1/delta_t, nperseg=1<<13)
+    # plt.pcolormesh(
+    #     t, f[:50], Sxx[:50, :], 
+    #     shading='gouraud', 
+    #     norm=mpl.colors.PowerNorm(gamma=.4)
+    # )
+    # plt.show()
+
+    # f, t, Sxx = signal.spectrogram(hplus, 1/delta_t, nperseg=1<<6)
+    # plt.pcolormesh(
+    #     t, f[:25], Sxx[:25], 
+    #     shading='gouraud', 
+    #     norm=mpl.colors.PowerNorm(gamma=.3)
+    # )
+    # plt.ylim(0, 2e4)
+    # plt.xlim(.498, .502)
+    # plt.show()
+
+    plt.plot((time-TIME_STOP)*1000, hplus)
+    plt.xlim(-100, 1)
+    plt.xlabel('Time from end of signal [ms]')
+    plt.show()
+
+if __name__ == '__main__':
+    main()
