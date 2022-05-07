@@ -31,13 +31,15 @@ Let's make a list of the potential problems with this approach:
 
 1. neutrino statistics: _is there at least one neutrino arriving later than the end of emission_?
 1. GW end time determination uncertainty: _can we determine the end of GW emission within sub-millisecond accuracy_?
-    1. sky localization errors: if there is no optical "counterpart" (star disappering), the localization error may overcome the 
-1. astrophysical delay systematics: the end of emission may not be as sharp as we would need / 
-   there is a difference at the source between the end times of GW and neutrino emission.
+1. astrophysical delay systematics: the end of emission may not be as sharp as we would need,
+   or there is a difference at the source between the end times of GW and neutrino emission.
 
 ## Neutrino statistics
 
-
+The rate of detected neutrinos is given in the form 
+$$ R = N_p \sigma \Phi \epsilon 
+$$
+where $N_p$ is the number of protons, $\sigma$ is the cross-section, $\Phi$ is the flux of neutrinos, $\epsilon$ is the detector efficiency (close to 1). 
 
 ## GW end time determination uncertainty
 
@@ -50,3 +52,18 @@ will I be able to recover the burst end time with sufficient precision?
 
 Already the sampling rate is not wonderful 
 - they give their waveforms at 16kHz, or 62.5microseconds between samples!
+
+Sky localization error may be an issue: if there is no optical "counterpart"
+(star disappering), the localization error may overcome this accuracy.
+
+Barring that, is the end of the signal even detectable within <1ms? 
+it seems like that's quite hard when we have even a low amount of noise. 
+
+However, there may be a workaround! 
+If the PNS collapses into a BH, it will have some leftover quadrupole, 
+and it will emit QNMs! 
+
+Are they detectable? Don't know! 
+It'd be good to make some estimates.
+
+It seems like nobody has GW simulations from failed SNe; write to David Radice! 
