@@ -131,3 +131,5 @@ dmypy.json
 
 GW_strains/
 sounds/
+
+*.pdf
