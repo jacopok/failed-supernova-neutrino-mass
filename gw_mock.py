@@ -9,6 +9,7 @@ import scipy.signal as signal
 from pycbc.psd import from_string as psd_from_string
 from pycbc.noise import noise_from_psd
 from pycbc.psd import interpolate
+from pycbc.filter.resample import highpass, lowpass
 
 from scipy.io.wavfile import write
 from scipy.signal.windows import get_window
@@ -40,7 +41,7 @@ def set_to_zero_after_time(time_stop: float, time_array: np.ndarray, waveform: n
     
     index_stop = np.searchsorted(time_array, time_stop)
 
-    transition_steps = 100
+    transition_steps = 1
 
     waveform[index_stop-transition_steps:index_stop] *= (np.arange(transition_steps, 0, step=-1) / transition_steps)**3
     waveform[index_stop:] = 0
@@ -55,7 +56,7 @@ def add_noise_and_whiten(waveform: np.ndarray, srate: int, seglen: float):
     low_frequency_cutoff=1
 
     my_psd = psd_from_string(
-        'aLIGOZeroDetHighPower', 
+        'EinsteinTelescopeP1600143', 
         int(srate / 2 / delta_f)+1, 
         delta_f, 
         low_frequency_cutoff,
@@ -67,8 +68,8 @@ def add_noise_and_whiten(waveform: np.ndarray, srate: int, seglen: float):
 
     noise = noise_from_psd(len(waveform), 1/srate, my_psd)
 
-    # waveform += noise
-    waveform = noise
+    waveform += noise
+    # waveform = noise
     
     window = get_window(('tukey', .1), len(waveform))
     
@@ -76,19 +77,22 @@ def add_noise_and_whiten(waveform: np.ndarray, srate: int, seglen: float):
 
     waveform = waveform.to_frequencyseries()
 
-    return waveform
+    # return waveform
     # my_psd = interpolate(my_psd, waveform.to_frequencyseries().delta_f) + 1e-60
 
-    whitened = waveform / np.sqrt(my_psd * 2 * seglen)
+    whitened = waveform / np.sqrt(my_psd / 2 / seglen)
     
-    return whitened.to_timeseries()
+    lowpassed = lowpass(whitened.to_timeseries(), 3000)
+    bandpassed = highpass(lowpassed, 100)
+    
+    return bandpassed
 
 
 def main():
 
-    TIME_STOP = 0.5
-    SRATE = 2**18
-    waveform_file = 'GW_strains/s15.0.swbj16.horo.3d.gw.dat'
+    TIME_STOP = 0.32
+    SRATE = 2**14
+    waveform_file = 'GW_strains/s60.0.swbj15.horo.3d.gw.dat'
     distance = 1. * u.kpc
 
     time, hplus = read_file_and_resample(waveform_file, SRATE, distance)
@@ -97,31 +101,33 @@ def main():
     
     hplus = add_noise_and_whiten(hplus, SRATE, len(hplus) / SRATE)
     
-    hplus_fd = hplus.to_frequencyseries()
+    # hplus_fd = hplus.to_frequencyseries()
     
-    plt.plot(hplus_fd.sample_frequencies, abs(hplus_fd))
-    seglen=len(hplus) / SRATE
-    delta_f = 1 / seglen
-    low_frequency_cutoff=1
-    my_psd = psd_from_string(
-        'aLIGOZeroDetHighPower', 
-        int(SRATE / 2 / delta_f)+1, 
-        delta_f, 
-        low_frequency_cutoff,
-    )
-    plt.plot(my_psd.sample_frequencies, abs(np.sqrt(my_psd.to_frequencyseries())))
-    plt.show()
-    
-    plt.plot(abs(hplus.to_frequencyseries()))
-    plt.show()
-
-    # f, t, Sxx = signal.spectrogram(hplus, 1/delta_t, nperseg=1<<13)
-    # plt.pcolormesh(
-    #     t, f[:50], Sxx[:50, :], 
-    #     shading='gouraud', 
-    #     norm=mpl.colors.PowerNorm(gamma=.4)
+    # plt.plot(hplus_fd.sample_frequencies, abs(hplus_fd))
+    # seglen=len(hplus) / SRATE
+    # delta_f = 1 / seglen
+    # low_frequency_cutoff=1
+    # my_psd = psd_from_string(
+    #     'EinsteinTelescopeP1600143', 
+    #     int(SRATE / 2 / delta_f)+1, 
+    #     delta_f, 
+    #     low_frequency_cutoff,
     # )
+    # plt.plot(my_psd.sample_frequencies, abs(np.sqrt(my_psd.to_frequencyseries())))
     # plt.show()
+    
+    # plt.plot(abs(hplus.to_frequencyseries()))
+    # plt.show()
+
+    f, t, Sxx = signal.spectrogram(hplus, 1/delta_t, nperseg=1<<8)
+    plt.pcolormesh(
+        t, f[:30], Sxx[:30, :], 
+        shading='gouraud', 
+        norm=mpl.colors.PowerNorm(gamma=.4)
+    )
+    plt.title(f'ET sensitivity, distance={distance}')
+    plt.savefig(f'spectrum_{distance.value}kpc.pdf')
+    plt.close()
 
     # f, t, Sxx = signal.spectrogram(hplus, 1/delta_t, nperseg=1<<6)
     # plt.pcolormesh(
@@ -133,10 +139,13 @@ def main():
     # plt.xlim(.498, .502)
     # plt.show()
 
-    plt.plot((time-TIME_STOP)*1000, hplus)
-    plt.xlim(-100, 1)
+    plt.plot((time[:-1]-TIME_STOP)*1000, hplus)
+    plt.xlim(-100, 20)
     plt.xlabel('Time from end of signal [ms]')
+    plt.title(f'ET sensitivity, distance={distance}')
+    plt.savefig(f'signal_{distance.value}kpc.pdf')
     plt.show()
+    plt.close()
 
 if __name__ == '__main__':
     main()
