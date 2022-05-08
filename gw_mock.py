@@ -87,6 +87,16 @@ def add_noise_and_whiten(waveform: np.ndarray, srate: int, seglen: float):
     
     return bandpassed
 
+def analyze(times, waveform):
+    width = .0005
+    
+    results = []
+    for t in times:
+        window = np.exp(-(times - t)**2 / 2 / width**2)
+        filtered = window * waveform
+        results.append(np.std(filtered))
+        
+    return np.array(results)
 
 def main():
 
@@ -139,13 +149,16 @@ def main():
     # plt.xlim(.498, .502)
     # plt.show()
 
+    results = analyze(time[:-1], hplus)
+    # plt.plot((time[:-1]-TIME_STOP)*1000, results*10)
     plt.plot((time[:-1]-TIME_STOP)*1000, hplus)
-    plt.xlim(-100, 20)
+    plt.xlim(-100, 100)
     plt.xlabel('Time from end of signal [ms]')
     plt.title(f'ET sensitivity, distance={distance}')
     plt.savefig(f'signal_{distance.value}kpc.pdf')
     plt.show()
     plt.close()
+
 
 if __name__ == '__main__':
     main()
