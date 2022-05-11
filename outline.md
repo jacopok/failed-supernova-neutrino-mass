@@ -1,3 +1,21 @@
+---
+# generate pdf with 
+# pandoc --citeproc outline.md -o outline.pdf
+# (ensure you have pandoc >2.11 installed)
+title: Neutrino masses from failed supernovae
+author: Jacopo Tissino
+bibliography: Neutrinos.bib
+abstract: |
+  Can we measure neutrino masses using a multimessenger detection of a failed supernova?
+
+link-citations: true
+
+hyperrefoptions:
+- linktoc=all
+- linkcolor=blue
+
+---
+
 # Neutrino masses from failed supernovae
 
 Can we measure the mass of neutrinos with a multi-messenger detection of a failed supernova?
@@ -7,9 +25,9 @@ $$ \Delta t \approx \frac{D}{c} \frac{m^2}{E^2}
 $$
 which looks like this:
 
-![figure](delays.png)
+![Delays from neutrinos ](delays.png)
 
-So, in principle we can use this effect to measure their mass! 
+So, in principle, we could use this effect to measure their mass! 
 The effect is tiny, less than a millisecond, while the timescale for emission 
 is quite long (on the order of 10 seconds) - how might we hope to detect such a signal then?
 
@@ -36,22 +54,42 @@ Let's make a list of the potential problems with this approach:
 
 ## Neutrino statistics
 
-The rate of detected neutrinos is given in the form 
+The rate of detected neutrinos per unit energy is given in the form 
 $$ R = N_p \sigma \Phi \epsilon 
 $$
 where $N_p$ is the number of protons, $\sigma$ is the cross-section, $\Phi$ is the flux of neutrinos, $\epsilon$ is the detector efficiency (close to 1). 
 
+For HyperHamiokande, the fiducial mass is about 186kilotons of water per tank (and there are two tanks);
+this can be converted into a number of protons with $N_P \approx M / m_p \times (10/18)$.
+
+The flux is taken to have the very simplistic form [@vissaniComparativeAnalysisSN1987A2015]
+$$ \Phi = \frac{L_\nu }{4 \pi D^2} \times \frac{E_\nu^2 e^{- E_\nu / T}}{6 T^4},
+$$
+which has the nice characteristic of allowing us to change the average neutrino energy $\langle E_\nu \rangle = 3 T$.
+
+If $L_\nu$ is in ergs per second, this has units of inverse energy, area and time. 
+
+Now, both $L_\nu$ and $T$ (or $\langle E_\nu \rangle$) evolve over time, but not by orders of magnitude,
+so for now I've kept them constant. 
+
+The value $T \approx 4 \text{MeV}$ is a good fit to the SN1987A data, so I've taken that.
+
+The cross-section and number of targets depend on the reaction we are discussing, but 
+again for simplicity I've just taken Inverse Beta Decay (which is relevant for HyperK),
+therefore the cross-section is [@giuntiFundamentalsNeutrinoPhysics2007]:
+$$ \sigma (E_\nu ) \approx 1.6 \times 10^{-44} \text{cm}^2 \left( \frac{E_\nu }{\text{MeV}} \right)^2
+$$
+
+
+
 ## GW end time determination uncertainty
 
-It seems [question during the ET OSB meeting to Adam Burrows] that there are no actual simulations
-of the GW emission from failed supernovae. 
+It seems [literature search + question during the ET OSB meeting to Adam Burrows + talk with David Radice] 
+that there are no actual simulations of the (QNM) GW emission from failed supernovae. 
 
 Until we have those, I work on a best-case-scenario hypothesis: I take a waveform from one of the 
 supernovae they simulated ([here](https://arxiv.org/abs/1812.07703)) and chop it at an arbitrary time;
 will I be able to recover the burst end time with sufficient precision?
-
-Already the sampling rate is not wonderful 
-- they give their waveforms at 16kHz, or 62.5microseconds between samples!
 
 Sky localization error may be an issue: if there is no optical "counterpart"
 (star disappering), the localization error may overcome this accuracy.
@@ -67,3 +105,5 @@ Are they detectable? Don't know!
 It'd be good to make some estimates.
 
 It seems like nobody has GW simulations from failed SNe; write to David Radice! 
+
+## Bibliography
