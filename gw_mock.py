@@ -14,6 +14,7 @@ from pycbc.filter.resample import highpass, lowpass
 from scipy.io.wavfile import write
 from scipy.signal.windows import get_window
 
+
 def make_wavable(array):
     """Make a numpy array ready to be saved as a WAV file.
     This entails turning it into integers, normalizing them 
@@ -88,11 +89,11 @@ def add_noise_and_whiten(waveform: np.ndarray, srate: int, seglen: float):
     return bandpassed
 
 def analyze(times, waveform):
-    width = .0005
+    width = .001
     
     results = []
     for t in times:
-        window = np.exp(-(times - t)**2 / 2 / width**2)
+        window = np.heaviside(times - t - width, 0) - np.heaviside(times - t + width, 0)
         filtered = window * waveform
         results.append(np.std(filtered))
         
@@ -158,7 +159,6 @@ def main():
     plt.savefig(f'signal_{distance.value}kpc.pdf')
     plt.show()
     plt.close()
-
-
+    
 if __name__ == '__main__':
     main()
