@@ -19,10 +19,10 @@ def detection_density(
     # Vissani 2015, eq. 1
     flux = L_nu / (4 * np.pi * D**2) * energies**2 * np.exp(- energies / T) / 6 / T**4
 
-    N_p = detector_mass / ac.m_p * 10 / 18
+    N_p = detector_mass / ac.m_p * 10 / 18  # composition of H2O
     sigma = cross_section(energies)
 
-    N_detected = (flux * N_p * sigma * efficiency).to(1/u.s / u.MeV)
+    N_detected = (flux * N_p * sigma * efficiency).to(1 / u.s / u.MeV)
     return N_detected
 
 class VariableGenerator:
@@ -35,9 +35,9 @@ class VariableGenerator:
         self.cumulative = np.cumsum(self.y_pdf * np.gradient(self.x_pdf))
         self.cumulative_prob = (self.cumulative / self.cumulative[-1]).to(u.dimensionless_unscaled).value
         
-    def __call__(self):
+    def __call__(self, size: tuple[int] = None):
         
-        val = self.rng.uniform(0, 1)
+        val = self.rng.uniform(0, 1, size=size)
         
         x = np.interp(val, self.cumulative_prob, self.x_pdf.value)
         
@@ -46,17 +46,22 @@ class VariableGenerator:
     @property
     def unit(self):
         return self.x_pdf.unit
+    
+    @property
+    def rate(self):
+        return self.cumulative[-1].to(u.kHz)
 
 energies = np.linspace(5, 40, num=1000) * u.MeV
 energy_generator = VariableGenerator(energies, detection_density(energies))
 
 if __name__ == '__main__':
 
+    print(energy_generator.rate)
     
-    values = energy_generator(100000)
+    values = energy_generator((100000,))
+    
     
     with quantity_support():
         plt.plot(energies, detection_density(energies))
         plt.hist(values, bins=100)
     plt.show()
-    
