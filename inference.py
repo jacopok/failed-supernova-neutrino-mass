@@ -49,7 +49,7 @@ def make_neutrino_list(max_time: float = MAX_TIME):
     return neutrinos
 
 def reconstructed_mass(mass: u.Quantity[u.meV], distance: u.Quantity[u.kpc]):
-    max_time = 0.01
+    max_time = 1e-3
     neutrinos = make_neutrino_list(max_time=max_time)
     for n in neutrinos:
         n.apply_delay(mass, distance)
