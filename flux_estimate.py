@@ -9,9 +9,8 @@ def cross_section(E):
 
 def detection_density(
     energies,
-    L_nu = 1e52 * u.erg/u.s,
-    T = 3 * u.MeV,
-    time = 10 * u.s,
+    L_nu = 5e51 * u.erg/u.s,
+    T = 4 * u.MeV,
     D = 10 * u.kpc,
     detector_mass = 2 * 187e6 * u.kg,  # 2*186kton = HyperK,
     efficiency = .95):
