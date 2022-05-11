@@ -5,12 +5,10 @@ import astropy.constants as ac
 from tqdm import tqdm
 
 from delays import delay
+from flux_estimate import energies, energy_generator
 
-
-MAX_TIME = 0.01 # maximum time for the arrival, seconds
+MAX_TIME = 10. # maximum time for the arrival, seconds
 EVENT_RATE = 4e3 # events per second
-MIN_ENERGY = 7 # MeV
-MAX_ENERGY = 30 # MeV
 
 @dataclass
 class DetectedNeutrino:
@@ -27,6 +25,9 @@ class DetectedNeutrino:
         
         return (self.energy * u.MeV * np.sqrt(delta_t * u.s * ac.c / distance)).to(u.meV)
 
+
+
+
 def make_neutrino_list(rate: float = EVENT_RATE, max_time: float = MAX_TIME):
     
     time = 0
@@ -38,7 +39,7 @@ def make_neutrino_list(rate: float = EVENT_RATE, max_time: float = MAX_TIME):
     while time <= max_time:
         neutrinos.append(
             DetectedNeutrino(
-                energy = rng.uniform(MIN_ENERGY, MAX_ENERGY),
+                energy = energy_generator(),
                 arrival_time = time
             )
         )
@@ -65,23 +66,28 @@ if __name__ == '__main__':
     
     n_trials = 20
 
-    reconstructed_masses = np.repeat(np.copy(masses)[:, None], n_trials, axis=1)
+    # reconstructed_masses = np.repeat(np.copy(masses)[:, None], n_trials, axis=1)
     
-    for i, mass in tqdm(enumerate(masses)):
-        for j in range(n_trials):
-            reconstructed_masses[i, j] = reconstructed_mass(mass, 50 * u.kpc)
+    # for i, mass in tqdm(enumerate(masses)):
+    #     for j in range(n_trials):
+    #         reconstructed_masses[i, j] = reconstructed_mass(mass, 50 * u.kpc)
     
-    for j in range(n_trials):
-        plt.scatter(masses, reconstructed_masses[:, j], s=1, c='black')
+    # for j in range(n_trials):
+    #     plt.scatter(masses, reconstructed_masses[:, j], s=1, c='black')
 
-    plt.xlabel('Original mass [meV]')
-    plt.ylabel('Reconstructed mass [meV]')
-    
-    # plt.scatter(
-    #     [n.arrival_time for n in neutrinos],
-    #     [n.energy for n in neutrinos],
-    # )
-    # plt.xlabel('Arrival time [s]')
-    # plt.ylabel('Energy [MeV]')
-    
-    plt.savefig('reconstructed_mass.pdf')
+
+    # plt.xlabel('Original mass [meV]')
+    # plt.ylabel('Reconstructed mass [meV]')
+
+    neutrinos = make_neutrino_list()
+    for n in neutrinos:
+        n.apply_delay(1*u.eV, 10 * u.kpc)
+
+    plt.scatter(
+        [n.arrival_time for n in neutrinos],
+        [n.energy for n in neutrinos],
+    )
+    plt.xlabel('Arrival time [s]')
+    plt.ylabel('Energy [MeV]')
+    plt.show()
+    # plt.savefig('reconstructed_mass.pdf')
