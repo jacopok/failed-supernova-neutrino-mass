@@ -15,6 +15,8 @@ hyperrefoptions:
 - linktoc=all
 - linkcolor=blue
 
+geometry: "left=3cm,right=3cm,top=2cm,bottom=2cm"
+output: pdf_document
 ---
 
 # Neutrino masses from failed supernovae
@@ -34,11 +36,11 @@ as well as bounds from neutrinoless double beta decay in the form $m_{ee} \lesss
 I didn't look up the precise numbers, that's the order of magnitude though.
 
 If we measure the propagation of an electron antineutrino, we are looking at
-$$ m_e = \sum _{i} U_{i e} m_i
+$$ m_{ee} = \sum _{i} U_{i e} m_i
 $$
 where $m_i$ are the three mass eigenstates, and $U$ is the flavor mixing matrix.
 
-Depending on the mass hierarchy, this mass is thought to be on the order of a few meV, or a few tens of meV.
+Depending on the mass hierarchy, this mass is likely to be on the order of a few meV, or a few tens of meV.
 
 ## Travel delays
 
@@ -49,7 +51,7 @@ $$ \Delta t \approx \frac{1}{2} \frac{D}{c} \frac{m^2}{E^2}
 $$
 which looks like this:
 
-![Neutrino delays.](delays.png)
+![Neutrino delays.](delays.pdf)
 
 So, in principle, we could use this effect to measure their mass! 
 The effect is tiny, less than a millisecond, while the timescale for emission 
@@ -64,22 +66,23 @@ then we can use the GWs to determine the emission end time, and compare to the l
 if there is a measurable delay, this gives us a _lower bound on a single* neutrino mass_!
 
 
-Let's make a list of the potential problems with this approach:
+Let's make a list of the problems with this approach:
 
 1. neutrino statistics: _is there at least one neutrino arriving later than the end of emission_?
 1. GW end time determination uncertainty: _can we determine the end of GW emission within sub-millisecond accuracy_?
 1. astrophysical delay systematics: the end of emission may not be as sharp as we would need,
    or there is a difference at the source between the end times of GW and neutrino emission.
 1. detector uncertainties and background: is the post-end neutrino really astrophysical? what's the uncertainty on the timing?
+1. Sky-localization uncertainty and timing.
 
-## Neutrino statistics and our fiducial model
+## Neutrino statistics and setup
 
 The rate of detected neutrinos per unit energy is given in the form 
 $$ R = N_p \sigma \Phi \epsilon 
 $$
 where $N_p$ is the number of protons, $\sigma$ is the cross-section, $\Phi$ is the flux of neutrinos, $\epsilon$ is the detector efficiency (close to 1). 
 
-For HyperHamiokande, the fiducial mass is about 186kilotons of water per tank (and there are two tanks) [@andHyperKamiokandeExperiment2017];
+For HyperHamiokande, the fiducial mass is about 186kilotons of water per tank (and there are two tanks) [@dilodovicoHyperKamiokandeExperiment2017];
 this can be converted into a number of protons with $N_P \approx M / m_p \times (10/18) \approx 10^{35}$.
 
 The flux is taken to have the very simplistic form [@vissaniComparativeAnalysisSN1987A2015]
@@ -103,11 +106,9 @@ $$
 
 For the efficiency I've taken $95 \%$. 
 
-### Results 
+![Reconstructed neutrino masses.](reconstructed_masses.pdf)
 
-![Reconstructed neutrino masses.](reconstructed_masses.png)
-
-![Probability of a post-end neutrino](probability.png)
+![Probability of a post-end neutrino](probability.pdf)
 
 ### Neutrino background
 
@@ -131,19 +132,22 @@ that there are no actual simulations of the _full_ GW emission from failed super
 Also [@cerda-duranGRAVITATIONALWAVESIGNATURES2013] have some older simulations of failed SNe GW emission.
 The same three points hold for them.
 
+### Setup
+
 Until we have those, I work on a best-case-scenario hypothesis: I take a waveform from one of the regular, non-failed
 supernovae [@radiceCharacterizingGravitationalWave2019] simulated and chop it at an arbitrary time;
 will I be able to recover the burst end time with sufficient precision?
 
-Barring that, is the end of the signal even detectable within <1ms? 
-it seems like that's quite hard when we have even a low amount of noise. 
+The procedure is as follows:
 
-However, there may be a workaround! 
-If the PNS collapses into a BH, it will have some leftover quadrupole, 
-and it will emit QNMs! 
+- Take the gravitational waveforms and normalize them to the correct distance;
+  - I'm ignoring detector response specifics and approximating $h_+ \approx h_{ij} D_{ij}$
+- add in a random realization of noise accoring to the PSD of a given detector;
+- whiten the data according to the known PSD
+- bandpass the data within some reasonable range.
 
-Are they detectable? Don't know! 
-It'd be good to make some estimates.
+![Signal with the ET sensitivity.](signal_10.0kpc.pdf)
+![Signal with the ET sensitivity.](signal_10.0kpc_zoom.pdf)
 
 ### QNMs 
 
@@ -188,5 +192,8 @@ $$
 
 What do these numbers amount to? Let us consider two detectors separated by Earth's radius, 
 which should be rather typical, and a delay $\Delta t = 100 \text{\textmu s}$. Then, 
+the value of $\delta$ will range from about a quarter of a degree to five degrees.
+
+So, if we don't precisely know the localization we're screwed!
 
 ## Bibliography
