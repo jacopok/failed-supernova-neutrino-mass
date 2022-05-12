@@ -25,7 +25,7 @@ def delay(
 if __name__ == '__main__':
     
     cmap = plt.get_cmap('viridis')
-    m_min, m_max = 20, 160
+    m_min, m_max = 20, 120
     norm = mpl.colors.Normalize(m_min, m_max)
 
     # neutrino energy
@@ -47,6 +47,5 @@ if __name__ == '__main__':
     # plt.legend(loc='upper right')
     plt.xlabel("Delay [ms]")
     plt.ylabel("Energy [MeV]")
-
     plt.savefig('delays.png')
     plt.close()
