@@ -9,6 +9,7 @@ abstract: |
   Can we measure neutrino masses using a multimessenger detection of a failed supernova?
 
 link-citations: true
+pdf-engine: xelatex
 
 hyperrefoptions:
 - linktoc=all
@@ -18,32 +19,50 @@ hyperrefoptions:
 
 # Neutrino masses from failed supernovae
 
+## Neutrino masses
+
+We know that (at least two out of three) neutrinos are massive: 
+from neutrino oscillations we have two $\Delta m^2$, differences in the squares of their
+masses on the order of 
+$$ \sqrt{| \Delta m^2 _{\text{atm}}|} \approx 50 \text{meV}
+$$
+$$ \sqrt{| \Delta m^2 _{\text{sol}}|} \approx 9 \text{meV}
+$$
+
+Also, we have bounds from cosmology in the form $\sum _\nu m_\nu < 400 \text{meV}$ roughly,
+as well as bounds from neutrinoless double beta decay in the form $m_{ee} \lesssim 100 \text{meV}$ roughly.
+I didn't look up the precise numbers, that's the order of magnitude though.
+
+If we measure the propagation of an electron antineutrino, we are looking at
+$$ m_e = \sum _{i} U_{i e} m_i
+$$
+where $m_i$ are the three mass eigenstates, and $U$ is the flavor mixing matrix.
+
+Depending on the mass hierarchy, this mass is thought to be on the order of a few meV, or a few tens of meV.
+
+## Travel delays
+
 Can we measure the mass of neutrinos with a multi-messenger detection of a failed supernova?
 
 The idea is the following: neutrinos being massive gives them a slight delay, which depends on energy: 
-$$ \Delta t \approx \frac{D}{c} \frac{m^2}{E^2}
+$$ \Delta t \approx \frac{1}{2} \frac{D}{c} \frac{m^2}{E^2}
 $$
 which looks like this:
 
-![Delays from neutrinos ](delays.png)
+![Neutrino delays.](delays.png)
 
 So, in principle, we could use this effect to measure their mass! 
 The effect is tiny, less than a millisecond, while the timescale for emission 
 is quite long (on the order of 10 seconds) - how might we hope to detect such a signal then?
 
 There is such a thing as a _failed supernova_: we know they happen (although they are quite rare),
-they are supernova events for which, at early times ($\lesssim 1 \text{s}$) a black hole is formed,
+they are supernova events for which, at early times ($\sim 1 \text{s}$) a black hole is formed,
 which abruptly stops the neutrino and gravitational wave emission.
 
 If this is abrupt enough, and if we have both gravitational wave and neutrino data for this event, 
 then we can use the GWs to determine the emission end time, and compare to the last neutrino arrival;
 if there is a measurable delay, this gives us a _lower bound on a single* neutrino mass_!
 
-Actually, we're not measuring "a neutrino mass"; we will very likely observe the interaction 
-of an electron antineutrino, and therefore measure 
-$$ m_e = \sum _{i} U_{i e} m_i
-$$
-where $m_i$ are the three mass eigenstates, and $U$ is the flavor mixing matrix.
 
 Let's make a list of the potential problems with this approach:
 
@@ -51,16 +70,17 @@ Let's make a list of the potential problems with this approach:
 1. GW end time determination uncertainty: _can we determine the end of GW emission within sub-millisecond accuracy_?
 1. astrophysical delay systematics: the end of emission may not be as sharp as we would need,
    or there is a difference at the source between the end times of GW and neutrino emission.
+1. detector uncertainties and background: is the post-end neutrino really astrophysical? what's the uncertainty on the timing?
 
-## Neutrino statistics
+## Neutrino statistics and our fiducial model
 
 The rate of detected neutrinos per unit energy is given in the form 
 $$ R = N_p \sigma \Phi \epsilon 
 $$
 where $N_p$ is the number of protons, $\sigma$ is the cross-section, $\Phi$ is the flux of neutrinos, $\epsilon$ is the detector efficiency (close to 1). 
 
-For HyperHamiokande, the fiducial mass is about 186kilotons of water per tank (and there are two tanks);
-this can be converted into a number of protons with $N_P \approx M / m_p \times (10/18)$.
+For HyperHamiokande, the fiducial mass is about 186kilotons of water per tank (and there are two tanks) [@andHyperKamiokandeExperiment2017];
+this can be converted into a number of protons with $N_P \approx M / m_p \times (10/18) \approx 10^{35}$.
 
 The flux is taken to have the very simplistic form [@vissaniComparativeAnalysisSN1987A2015]
 $$ \Phi = \frac{L_\nu }{4 \pi D^2} \times \frac{E_\nu^2 e^{- E_\nu / T}}{6 T^4},
@@ -68,6 +88,7 @@ $$
 which has the nice characteristic of allowing us to change the average neutrino energy $\langle E_\nu \rangle = 3 T$.
 
 If $L_\nu$ is in ergs per second, this has units of inverse energy, area and time. 
+I've taken $L_\nu = 5 \times 10^{51} \text{erg/s}$, and a distance $D = 10 \text{kpc}$.
 
 Now, both $L_\nu$ and $T$ (or $\langle E_\nu \rangle$) evolve over time, but not by orders of magnitude,
 so for now I've kept them constant. 
@@ -80,19 +101,39 @@ therefore the cross-section is [@giuntiFundamentalsNeutrinoPhysics2007]:
 $$ \sigma (E_\nu ) \approx 1.6 \times 10^{-44} \text{cm}^2 \left( \frac{E_\nu }{\text{MeV}} \right)^2
 $$
 
+For the efficiency I've taken $95 \%$. 
 
+### Results 
+
+![Reconstructed neutrino masses.](reconstructed_masses.png)
+
+![Probability of a post-end neutrino](probability.png)
+
+### Neutrino background
+
+I haven't found the expected background rate for HyperK, but if it's on the order of a few Hertz we're good:
+the window for this search is very narrow, and it is very unlikely that a background event would be 
+detected there. 
+
+If the background is on the order of kHz, we've got bigger problems on our hands.
 
 ## GW end time determination uncertainty
 
 It seems [literature search + question during the ET OSB meeting to Adam Burrows + talk with David Radice] 
-that there are no actual simulations of the (QNM) GW emission from failed supernovae. 
+that there are no actual simulations of the _full_ GW emission from failed supernovae. 
 
-Until we have those, I work on a best-case-scenario hypothesis: I take a waveform from one of the 
-supernovae they simulated ([here](https://arxiv.org/abs/1812.07703)) and chop it at an arbitrary time;
+[@panStellarMassBlack2021] do simulate a failed SN, but they:
+
+- compute GWs with the quadrupole formula, so there are no GR effects such as QNMs;
+- do not publish their raw waveforms, as far as I can tell;
+- stop simulating right at BH formation. 
+
+Also [@cerda-duranGRAVITATIONALWAVESIGNATURES2013] have some older simulations of failed SNe GW emission.
+The same three points hold for them.
+
+Until we have those, I work on a best-case-scenario hypothesis: I take a waveform from one of the regular, non-failed
+supernovae [@radiceCharacterizingGravitationalWave2019] simulated and chop it at an arbitrary time;
 will I be able to recover the burst end time with sufficient precision?
-
-Sky localization error may be an issue: if there is no optical "counterpart"
-(star disappering), the localization error may overcome this accuracy.
 
 Barring that, is the end of the signal even detectable within <1ms? 
 it seems like that's quite hard when we have even a low amount of noise. 
@@ -104,6 +145,48 @@ and it will emit QNMs!
 Are they detectable? Don't know! 
 It'd be good to make some estimates.
 
-It seems like nobody has GW simulations from failed SNe; write to David Radice! 
+### QNMs 
+
+Exponentially decaying oscillations from excited BHs at various multipoles. 
+When given a mass, we know the decay rates and the frequencies analytically; 
+many of them must be considered for a complete description, but the lowest-frequency one has
+$$ f \approx 4 \text{kHz} \left( \frac{M}{3 M_{\odot}}\right)^{-1}
+$$
+
+What is the mass of the black hole of interest? It will increase as it accretes over the first milliseconds,
+so the frequency of the modes should decrease, and the accretion will probably be noticeably nonisotropic, 
+thereby providing a continuous source to the modes for some time. 
+
+This is all speculation, really, but there might be a way to model these signals, since 
+they are at least partly analytically known. 
+For the purposes of this work, we'd only need to figure out where this emission _starts_ to within some margin.
+
+@easterCanWeMeasure2021 did something vaguely similar, so it's interesting to mention: 
+they made an injection study of post-merger waveforms with A+ detectors and ET, 
+where the PNS collapses at a certain point, within a 2ms window. 
+With A+ sensitivities, they reach uncertainties on the collapse time on the order of 0.3-0.4 milliseconds. 
+This is promising! 
+The waveforms looked at for failed SNe could be similar. 
+
+### Sky localization error
+
+Sky localization error may be an issue: if there is no optical "counterpart"
+(star disappering), the localization error may overcome this accuracy.
+
+A light-millisecond is 300km, distances between detectors are on the order of $10^{4} \text{km}$.
+
+Suppose two detectors are at a distance $D$, and we want to figure out the angular variation $\delta$ 
+corresponding to a delay $\Delta t$. 
+This will of course depend on the source orientation, but let's look at the limiting cases.
+
+For a source positioned on the connecting line between the two detectors, we will have 
+$$ \frac{c \Delta t}{D} \approx \frac{\delta^2}{2}
+$$
+while for a source positioned orthogonal to the connecting line we will have 
+$$ \frac{c \Delta t}{D} \approx \delta 
+$$
+
+What do these numbers amount to? Let us consider two detectors separated by Earth's radius, 
+which should be rather typical, and a delay $\Delta t = 100 \text{\textmu s}$. Then, 
 
 ## Bibliography
