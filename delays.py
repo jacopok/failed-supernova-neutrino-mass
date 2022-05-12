@@ -47,5 +47,5 @@ if __name__ == '__main__':
     # plt.legend(loc='upper right')
     plt.xlabel("Delay [ms]")
     plt.ylabel("Energy [MeV]")
-    plt.savefig('delays.png')
+    plt.savefig('delays.pdf')
     plt.close()

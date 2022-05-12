@@ -99,12 +99,12 @@ def analyze(times, waveform):
         
     return np.array(results)
 
-def main():
+def make_plots(distance):
 
-    TIME_STOP = 0.32
+    TIME_STOP = 0.30
     SRATE = 2**14
     waveform_file = 'GW_strains/s60.0.swbj15.horo.3d.gw.dat'
-    distance = 1. * u.kpc
+    # distance = 1. * u.kpc
 
     time, hplus = read_file_and_resample(waveform_file, SRATE, distance)
     hplus = set_to_zero_after_time(TIME_STOP, time, hplus)
@@ -132,7 +132,7 @@ def main():
 
     f, t, Sxx = signal.spectrogram(hplus, 1/delta_t, nperseg=1<<8)
     plt.pcolormesh(
-        t, f[:30], Sxx[:30, :], 
+        t, f[:25], Sxx[:25, :], 
         shading='gouraud', 
         norm=mpl.colors.PowerNorm(gamma=.4)
     )
@@ -153,12 +153,17 @@ def main():
     results = analyze(time[:-1], hplus)
     # plt.plot((time[:-1]-TIME_STOP)*1000, results*10)
     plt.plot((time[:-1]-TIME_STOP)*1000, hplus)
-    plt.xlim(-100, 100)
+    plt.xlim(-50, 50)
     plt.xlabel('Time from end of signal [ms]')
     plt.title(f'ET sensitivity, distance={distance}')
     plt.savefig(f'signal_{distance.value}kpc.pdf')
-    plt.show()
+    plt.xlim(-5, 5)
+    plt.savefig(f'signal_{distance.value}kpc_zoom.pdf')
+    
     plt.close()
     
 if __name__ == '__main__':
-    main()
+    distances = np.array([1, 10]) * u.kpc
+    
+    for d in distances:
+        make_plots(d)

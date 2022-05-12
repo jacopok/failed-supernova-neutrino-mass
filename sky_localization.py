@@ -7,5 +7,5 @@ delta_t = 100 * u.us
 
 ratio = (ac.c * delta_t / D).to(u.dimensionless_unscaled).value
 
-print(f'Aligned case: delta = {(np.sqrt(2 * ratio) * u.rad).to(u.degree)}')
-print(f'Orthogonal case: delta = {(ratio*u.rad).to(u.degree)}')
+print(f'Aligned case: delta = {(np.arccos(1-ratio) * u.rad).to(u.degree)}')
+print(f'Orthogonal case: delta = {(np.arcsin(ratio)*u.rad).to(u.degree)}')
