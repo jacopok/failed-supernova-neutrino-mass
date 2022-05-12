@@ -22,7 +22,7 @@ class DetectedNeutrino:
         if delta_t < 0:
             return 0 * u.meV
         
-        return (self.energy * u.MeV * np.sqrt(delta_t * u.s * ac.c / distance)).to(u.meV)
+        return (self.energy * u.MeV * np.sqrt(2 * delta_t * u.s * ac.c / distance)).to(u.meV)
 
 
 def make_neutrino_list(max_time: float = MAX_TIME):
