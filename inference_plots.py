@@ -8,7 +8,7 @@ from inference import reconstructed_mass
 
 masses = np.linspace(1, 120, num=20) * u.meV
 
-n_trials = 100
+n_trials = 1000
 
 reconstructed_masses = np.repeat(np.copy(masses)[:, None], n_trials, axis=1)
 
